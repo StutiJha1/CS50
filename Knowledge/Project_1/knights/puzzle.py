@@ -1,4 +1,4 @@
-from Knowledge.Project_1.knights.logic import *
+from logic import *
 
 AKnight = Symbol("A is a Knight")
 AKnave = Symbol("A is a Knave")
@@ -54,6 +54,9 @@ knowledge2 = And(
 # B says "A said 'I am a knave'."
 # B says "C is a knave."
 # C says "A is a knight."
+Asaid_knight = Symbol("A said 'I am a knight'")
+Asaid_knave = Symbol("A said 'I am a knave'")
+
 knowledge3 = And(
     # Identity rules
     Or(AKnight, AKnave),
@@ -64,24 +67,33 @@ knowledge3 = And(
     Not(And(CKnight, CKnave)),
 
     # A said either "I am a knight" or "I am a knave"
-    Or(AKnight, AKnave),  # A made one of the two statements
+    Or(Asaid_knight, Asaid_knave),
+    Not(And(Asaid_knight, Asaid_knave)),
+    # A made one of the two statements
 
-    # B says: A said "I am a knave"
-    Implication(BKnight, AKnave),
-    Implication(BKnave, Not(AKnave)),
+    Implication(Asaid_knight, Implication(AKnight, AKnight)),  # redundant but fine
+    Implication(Asaid_knight, Implication(AKnave, Not(AKnight))),
 
-    # B says: "C is a knave"
+    # If A said "I am a knave"
+    Implication(Asaid_knave, Implication(AKnight, AKnave)),
+    Implication(Asaid_knave, Implication(AKnave, Not(AKnave))),
+
+    # B says A said "I am a knave"
+    Implication(BKnight, Asaid_knave),
+    Implication(BKnave, Not(Asaid_knave)),
+
+    # B says "C is a knave"
     Implication(BKnight, CKnave),
     Implication(BKnave, Not(CKnave)),
 
-    # C says: "A is a knight"
+    # C says "A is a knight"
     Implication(CKnight, AKnight),
     Implication(CKnave, Not(AKnight))
 )
 
 
 def main():
-    symbols = [AKnight, AKnave, BKnight, BKnave, CKnight, CKnave]
+    symbols = [AKnight, AKnave, BKnight, BKnave, CKnight, CKnave,  Asaid_knight, Asaid_knave]
     puzzles = [
         ("Puzzle 0", knowledge0),
         ("Puzzle 1", knowledge1),
